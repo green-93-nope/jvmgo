@@ -1,5 +1,7 @@
 package classfile
 
+import ()
+
 /*
 field_info {
     u2             access_flags;
@@ -52,4 +54,15 @@ func (self *MemberInfo) Name() string {
 
 func (self *MemberInfo) Descriptor() string {
 	return self.cp.getUtf8(self.descriptorIndex)
+}
+
+// get attribute of code from the attribute array
+func (self *MemberInfo) CodeAttribute() *CodeAttribute {
+	for _, attrInfo := range self.attributes {
+		switch attrInfo.(type) {
+		case *CodeAttribute:
+			return attrInfo.(*CodeAttribute)
+		}
+	}
+	return nil
 }

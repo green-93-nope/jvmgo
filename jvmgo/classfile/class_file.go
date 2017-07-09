@@ -111,7 +111,7 @@ func (self *ClassFile) Fields() []*MemberInfo {
 }
 
 func (self *ClassFile) Methods() []*MemberInfo {
-	return self.fields
+	return self.methods
 }
 
 // ClassName return the name of class which stores in constantPool
