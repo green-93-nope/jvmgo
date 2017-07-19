@@ -3,6 +3,7 @@ package constants
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
+	"jvmgo/jvmgo/rtda/heap"
 )
 
 type LDC struct{ base.Index8Instruction }
@@ -19,14 +20,21 @@ func (self *LDC_W) Execute(frame *rtda.Frame) {
 
 func _ldc(frame *rtda.Frame, index uint) {
 	stack := frame.OperandStack()
-	cp := frame.Method().Class().ConstantPool()
-	c := cp.GetConstant(index)
+	class := frame.Method().Class()
+	c := class.ConstantPool().GetConstant(index)
 
 	switch c.(type) {
 	case int32:
 		stack.PushInt(c.(int32))
 	case float32:
 		stack.PushFloat(c.(float32))
+	case string:
+		internedStr := heap.JString(class.Loader(), c.(string))
+		stack.PushRef(internedStr)
+	case *heap.ClassRef: // instance of class constant
+		classRef := c.(*heap.ClassRef)
+		classObj := classRef.ResolvedClass().JClass()
+		stack.PushRef(classObj)
 	default:
 		panic("todo:ldc!")
 	}
