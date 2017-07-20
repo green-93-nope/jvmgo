@@ -1,11 +1,16 @@
 package heap
 
-import (
-	"fmt"
-	"jvmgo/jvmgo/classfile"
-	"jvmgo/jvmgo/classpath"
-)
+import "fmt"
+import "jvmgo/jvmgo/classfile"
+import "jvmgo/jvmgo/classpath"
 
+/*
+class names:
+    - primitive types: boolean, byte, int ...
+    - primitive arrays: [Z, [B, [I ...
+    - non-array classes: java/lang/Object ...
+    - array classes: [Ljava/lang/Object; ...
+*/
 type ClassLoader struct {
 	cp          *classpath.Classpath
 	verboseFlag bool
@@ -24,25 +29,6 @@ func NewClassLoader(cp *classpath.Classpath, verboseFlag bool) *ClassLoader {
 	return loader
 }
 
-func (self *ClassLoader) loadPrimitiveClasses() {
-	for primitiveTypes, _ := range primitiveTypes {
-		self.loadPrimitiveClass(primitiveTypes)
-	}
-}
-
-func (self *ClassLoader) loadPrimitiveClass(className string) {
-	class := &Class{
-		accessFlags: ACC_PUBLIC,
-		name:        className,
-		loader:      self,
-		initStarted: true,
-	}
-	class.jClass = self.classMap["java/lang/Class"].NewObject()
-	class.jClass.extra = class
-	self.classMap[className] = class
-}
-
-// load instance of class
 func (self *ClassLoader) loadBasicClasses() {
 	jlClassClass := self.LoadClass("java/lang/Class")
 	for _, class := range self.classMap {
@@ -53,19 +39,37 @@ func (self *ClassLoader) loadBasicClasses() {
 	}
 }
 
+func (self *ClassLoader) loadPrimitiveClasses() {
+	for primitiveType, _ := range primitiveTypes {
+		self.loadPrimitiveClass(primitiveType)
+	}
+}
+
+func (self *ClassLoader) loadPrimitiveClass(className string) {
+	class := &Class{
+		accessFlags: ACC_PUBLIC, // todo
+		name:        className,
+		loader:      self,
+		initStarted: true,
+	}
+	class.jClass = self.classMap["java/lang/Class"].NewObject()
+	class.jClass.extra = class
+	self.classMap[className] = class
+}
+
 func (self *ClassLoader) LoadClass(name string) *Class {
 	if class, ok := self.classMap[name]; ok {
-		return class // already loaded
+		// already loaded
+		return class
 	}
 
 	var class *Class
-	if name[0] == '[' {
+	if name[0] == '[' { // array class
 		class = self.loadArrayClass(name)
 	} else {
 		class = self.loadNonArrayClass(name)
 	}
 
-	// every loaded class need a class object
 	if jlClassClass, ok := self.classMap["java/lang/Class"]; ok {
 		class.jClass = jlClassClass.NewObject()
 		class.jClass.extra = class
@@ -76,7 +80,7 @@ func (self *ClassLoader) LoadClass(name string) *Class {
 
 func (self *ClassLoader) loadArrayClass(name string) *Class {
 	class := &Class{
-		accessFlags: ACC_PUBLIC,
+		accessFlags: ACC_PUBLIC, // todo
 		name:        name,
 		loader:      self,
 		initStarted: true,
@@ -94,9 +98,11 @@ func (self *ClassLoader) loadNonArrayClass(name string) *Class {
 	data, entry := self.readClass(name)
 	class := self.defineClass(data)
 	link(class)
+
 	if self.verboseFlag {
 		fmt.Printf("[Loaded %s from %s]\n", name, entry)
 	}
+
 	return class
 }
 
@@ -108,8 +114,10 @@ func (self *ClassLoader) readClass(name string) ([]byte, classpath.Entry) {
 	return data, entry
 }
 
+// jvms 5.3.5
 func (self *ClassLoader) defineClass(data []byte) *Class {
 	class := parseClass(data)
+	hackClass(class)
 	class.loader = self
 	resolveSuperClass(class)
 	resolveInterfaces(class)
@@ -120,17 +128,18 @@ func (self *ClassLoader) defineClass(data []byte) *Class {
 func parseClass(data []byte) *Class {
 	cf, err := classfile.Parse(data)
 	if err != nil {
-		panic("java.lang.ClassFormatError")
+		//panic("java.lang.ClassFormatError")
+		panic(err)
 	}
 	return newClass(cf)
 }
 
+// jvms 5.4.3.1
 func resolveSuperClass(class *Class) {
 	if class.name != "java/lang/Object" {
 		class.superClass = class.loader.LoadClass(class.superClassName)
 	}
 }
-
 func resolveInterfaces(class *Class) {
 	interfaceCount := len(class.interfaceNames)
 	if interfaceCount > 0 {
@@ -147,9 +156,10 @@ func link(class *Class) {
 }
 
 func verify(class *Class) {
-	// todo provide jvm class verification
+	// todo
 }
 
+// jvms 5.4.2
 func prepare(class *Class) {
 	calcInstanceFieldSlotIds(class)
 	calcStaticFieldSlotIds(class)
@@ -187,7 +197,6 @@ func calcStaticFieldSlotIds(class *Class) {
 	class.staticSlotCount = slotId
 }
 
-// golang assure that the default value of new create slot is zero, we only need to deal with static final value
 func allocAndInitStaticVars(class *Class) {
 	class.staticVars = newSlots(class.staticSlotCount)
 	for _, field := range class.fields {
@@ -222,5 +231,13 @@ func initStaticFinalVar(class *Class, field *Field) {
 			jStr := JString(class.Loader(), goStr)
 			vars.SetRef(slotId, jStr)
 		}
+	}
+}
+
+// todo
+func hackClass(class *Class) {
+	if class.name == "java/lang/ClassLoader" {
+		loadLibrary := class.GetStaticMethod("loadLibrary", "(Ljava/lang/Class;Ljava/lang/String;Z)V")
+		loadLibrary.code = []byte{0xb1} // return void
 	}
 }

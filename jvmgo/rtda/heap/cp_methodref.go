@@ -1,8 +1,6 @@
 package heap
 
-import (
-	"jvmgo/jvmgo/classfile"
-)
+import "jvmgo/jvmgo/classfile"
 
 type MethodRef struct {
 	MemberRef
@@ -23,6 +21,7 @@ func (self *MethodRef) ResolvedMethod() *Method {
 	return self.method
 }
 
+// jvms8 5.4.3.3
 func (self *MethodRef) resolveMethodRef() {
 	d := self.cp.class
 	c := self.ResolvedClass()

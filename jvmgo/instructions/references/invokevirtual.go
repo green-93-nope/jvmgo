@@ -1,7 +1,6 @@
 package references
 
 import (
-	"fmt"
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
 	"jvmgo/jvmgo/rtda/heap"
@@ -20,10 +19,6 @@ func (self *INVOKE_VIRTUAL) Execute(frame *rtda.Frame) {
 
 	ref := frame.OperandStack().GetRefFromTop(resolvedMethod.ArgSlotCount() - 1)
 	if ref == nil {
-		if methodRef.Name() == "println" {
-			_println(frame.OperandStack(), methodRef.Descriptor())
-			return
-		}
 		panic("java.lang.IllegalAccessError")
 	}
 
@@ -42,28 +37,4 @@ func (self *INVOKE_VIRTUAL) Execute(frame *rtda.Frame) {
 	}
 
 	base.InvokeMethod(frame, methodToBeInvoked)
-}
-
-func _println(stack *rtda.OperandStack, descriptor string) {
-	switch descriptor {
-	case "(Z)V":
-		fmt.Printf("%v\n", stack.PopInt() != 0)
-	case "(C)V":
-		fmt.Printf("%c\n", stack.PopInt())
-	case "(I)V", "(B)V", "(S)V":
-		fmt.Printf("%v\n", stack.PopInt())
-	case "(F)V":
-		fmt.Printf("%v\n", stack.PopFloat())
-	case "(J)V":
-		fmt.Printf("%v\n", stack.PopLong())
-	case "(D)V":
-		fmt.Printf("%v\n", stack.PopDouble())
-	case "(Ljava/lang/String;)V":
-		jStr := stack.PopRef()
-		goStr := heap.GoString(jStr)
-		fmt.Println(goStr)
-	default:
-		panic("println: " + descriptor)
-	}
-	stack.PopRef()
 }

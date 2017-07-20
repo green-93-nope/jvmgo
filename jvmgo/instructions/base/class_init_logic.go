@@ -5,6 +5,12 @@ import (
 	"jvmgo/jvmgo/rtda/heap"
 )
 
+// class init is invoked in the following situations:
+// new
+// putstatic getstatic
+// invokestatic
+// when the class is initialized and its super class is not initialized
+// some reflection operation
 func InitClass(thread *rtda.Thread, class *heap.Class) {
 	class.StartInit()
 	scheduleClinit(thread, class)

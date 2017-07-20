@@ -1,8 +1,6 @@
 package heap
 
-import (
-	"jvmgo/jvmgo/classfile"
-)
+import "jvmgo/jvmgo/classfile"
 
 type MemberRef struct {
 	SymRef
@@ -18,7 +16,6 @@ func (self *MemberRef) copyMemberRefInfo(refInfo *classfile.ConstantMemberrefInf
 func (self *MemberRef) Name() string {
 	return self.name
 }
-
 func (self *MemberRef) Descriptor() string {
 	return self.descriptor
 }

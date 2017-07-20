@@ -1,8 +1,6 @@
 package heap
 
-import (
-	"jvmgo/jvmgo/classfile"
-)
+import "jvmgo/jvmgo/classfile"
 
 type Field struct {
 	ClassMember
@@ -20,6 +18,21 @@ func newFields(class *Class, cfFields []*classfile.MemberInfo) []*Field {
 	}
 	return fields
 }
+func (self *Field) copyAttributes(cfField *classfile.MemberInfo) {
+	if valAttr := cfField.ConstantValueAttribute(); valAttr != nil {
+		self.constValueIndex = uint(valAttr.ConstantValueIndex())
+	}
+}
+
+func (self *Field) IsVolatile() bool {
+	return 0 != self.accessFlags&ACC_VOLATILE
+}
+func (self *Field) IsTransient() bool {
+	return 0 != self.accessFlags&ACC_TRANSIENT
+}
+func (self *Field) IsEnum() bool {
+	return 0 != self.accessFlags&ACC_ENUM
+}
 
 func (self *Field) ConstValueIndex() uint {
 	return self.constValueIndex
@@ -27,13 +40,12 @@ func (self *Field) ConstValueIndex() uint {
 func (self *Field) SlotId() uint {
 	return self.slotId
 }
-
 func (self *Field) isLongOrDouble() bool {
 	return self.descriptor == "J" || self.descriptor == "D"
 }
 
-func (self *Field) copyAttributes(cfField *classfile.MemberInfo) {
-	if valAttr := cfField.ConstantValueAttribute(); valAttr != nil {
-		self.constValueIndex = uint(valAttr.ConstantValueIndex())
-	}
+// reflection
+func (self *Field) Type() *Class {
+	className := toClassName(self.descriptor)
+	return self.class.loader.LoadClass(className)
 }

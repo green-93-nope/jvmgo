@@ -1,8 +1,6 @@
 package heap
 
-import (
-	"jvmgo/jvmgo/classfile"
-)
+import "jvmgo/jvmgo/classfile"
 
 type InterfaceMethodRef struct {
 	MemberRef
@@ -23,6 +21,7 @@ func (self *InterfaceMethodRef) ResolvedInterfaceMethod() *Method {
 	return self.method
 }
 
+// jvms8 5.4.3.4
 func (self *InterfaceMethodRef) resolveInterfaceMethodRef() {
 	d := self.cp.class
 	c := self.ResolvedClass()
@@ -41,11 +40,13 @@ func (self *InterfaceMethodRef) resolveInterfaceMethodRef() {
 	self.method = method
 }
 
+// todo
 func lookupInterfaceMethod(iface *Class, name, descriptor string) *Method {
 	for _, method := range iface.methods {
 		if method.name == name && method.descriptor == descriptor {
 			return method
 		}
 	}
+
 	return lookupMethodInInterfaces(iface.interfaces, name, descriptor)
 }

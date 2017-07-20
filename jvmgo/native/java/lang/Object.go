@@ -1,32 +1,36 @@
 package lang
 
-import (
-	"jvmgo/jvmgo/native"
-	"jvmgo/jvmgo/rtda"
-	"unsafe"
-)
+import "unsafe"
+import "jvmgo/jvmgo/native"
+import "jvmgo/jvmgo/rtda"
+
+const jlObject = "java/lang/Object"
 
 func init() {
-	// return the instance of class responding to the object
-	native.Register("java/lang/Object", "getClass", "()Ljava/lang/Class;", getClass)
-	native.Register("java/lang/Object", "hashCode", "()I", hashCode)
-	native.Register("java/lang/Object", "clone", "()Ljava/lang/Object;", clone)
+	native.Register(jlObject, "getClass", "()Ljava/lang/Class;", getClass)
+	native.Register(jlObject, "hashCode", "()I", hashCode)
+	native.Register(jlObject, "clone", "()Ljava/lang/Object;", clone)
+	native.Register(jlObject, "notifyAll", "()V", notifyAll)
 }
 
-// public final native Class<?> getClass()
+// public final native Class<?> getClass();
+// ()Ljava/lang/Class;
 func getClass(frame *rtda.Frame) {
 	this := frame.LocalVars().GetThis()
 	class := this.Class().JClass()
 	frame.OperandStack().PushRef(class)
 }
 
-// public native int hashCode()
+// public native int hashCode();
+// ()I
 func hashCode(frame *rtda.Frame) {
 	this := frame.LocalVars().GetThis()
 	hash := int32(uintptr(unsafe.Pointer(this)))
 	frame.OperandStack().PushInt(hash)
 }
 
+// protected native Object clone() throws CloneNotSupportedException;
+// ()Ljava/lang/Object;
 func clone(frame *rtda.Frame) {
 	this := frame.LocalVars().GetThis()
 
@@ -36,4 +40,10 @@ func clone(frame *rtda.Frame) {
 	}
 
 	frame.OperandStack().PushRef(this.Clone())
+}
+
+// public final native void notifyAll();
+// ()V
+func notifyAll(frame *rtda.Frame) {
+	// todo
 }

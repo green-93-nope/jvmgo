@@ -1,8 +1,6 @@
 package heap
 
-import (
-	"jvmgo/jvmgo/classfile"
-)
+import "jvmgo/jvmgo/classfile"
 
 type ExceptionTable []*ExceptionHandler
 
@@ -19,30 +17,30 @@ func newExceptionTable(entries []*classfile.ExceptionTableEntry, cp *ConstantPoo
 		table[i] = &ExceptionHandler{
 			startPc:   int(entry.StartPc()),
 			endPc:     int(entry.EndPc()),
-			handlerPc: int(entry.HandlePc()),
+			handlerPc: int(entry.HandlerPc()),
 			catchType: getCatchType(uint(entry.CatchType()), cp),
 		}
 	}
+
 	return table
 }
 
 func getCatchType(index uint, cp *ConstantPool) *ClassRef {
-	if index == 0 { // cp index 0 means catch all
-		return nil
+	if index == 0 {
+		return nil // catch all
 	}
 	return cp.GetConstant(index).(*ClassRef)
 }
 
 func (self ExceptionTable) findExceptionHandler(exClass *Class, pc int) *ExceptionHandler {
 	for _, handler := range self {
+		// jvms: The start_pc is inclusive and end_pc is exclusive
 		if pc >= handler.startPc && pc < handler.endPc {
-			// startPc is the next pc of try block, endPc is the next pc out of try block
-			if handler.catchType == nil { // catch all type
+			if handler.catchType == nil {
 				return handler
 			}
 			catchClass := handler.catchType.ResolvedClass()
 			if catchClass == exClass || catchClass.IsSuperClassOf(exClass) {
-				// if the type of exception Class is the same or sub of catch class
 				return handler
 			}
 		}

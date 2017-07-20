@@ -1,16 +1,17 @@
 package lang
 
-import (
-	"jvmgo/jvmgo/native"
-	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
-)
+import "jvmgo/jvmgo/native"
+import "jvmgo/jvmgo/rtda"
+import "jvmgo/jvmgo/rtda/heap"
+
+const jlString = "java/lang/String"
 
 func init() {
-	native.Register("java/lang/String", "intern", "()Ljava/lang/String;", intern)
+	native.Register(jlString, "intern", "()Ljava/lang/String;", intern)
 }
 
-// public native String intern()
+// public native String intern();
+// ()Ljava/lang/String;
 func intern(frame *rtda.Frame) {
 	this := frame.LocalVars().GetThis()
 	interned := heap.InternString(this)

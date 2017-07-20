@@ -1,10 +1,6 @@
 package rtda
 
-import (
-	"jvmgo/jvmgo/rtda/heap"
-)
-
-// Slot is the element that stored in LocalVars
+import "jvmgo/jvmgo/rtda/heap"
 
 type Slot struct {
 	num int32

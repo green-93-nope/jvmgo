@@ -31,7 +31,7 @@ type CodeAttribute struct {
 type ExceptionTableEntry struct {
 	startPc   uint16
 	endPc     uint16
-	handlePc  uint16
+	handlerPc uint16
 	catchType uint16
 }
 
@@ -67,7 +67,7 @@ func readExceptionTable(reader *ClassReader) []*ExceptionTableEntry {
 		exceptionTable[i] = &ExceptionTableEntry{
 			startPc:   reader.readUint16(),
 			endPc:     reader.readUint16(),
-			handlePc:  reader.readUint16(),
+			handlerPc: reader.readUint16(),
 			catchType: reader.readUint16(),
 		}
 	}
@@ -82,8 +82,8 @@ func (self *ExceptionTableEntry) EndPc() uint16 {
 	return self.endPc
 }
 
-func (self *ExceptionTableEntry) HandlePc() uint16 {
-	return self.handlePc
+func (self *ExceptionTableEntry) HandlerPc() uint16 {
+	return self.handlerPc
 }
 
 func (self *ExceptionTableEntry) CatchType() uint16 {

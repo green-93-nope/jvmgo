@@ -1,23 +1,13 @@
 package heap
 
-import (
-	"fmt"
-	"jvmgo/jvmgo/classfile"
-)
+import "fmt"
+import "jvmgo/jvmgo/classfile"
 
-// can be int float double long and other format in constant Pool
 type Constant interface{}
 
 type ConstantPool struct {
-	class  *Class // the class which contains constant pool
+	class  *Class
 	consts []Constant
-}
-
-func (self *ConstantPool) GetConstant(index uint) Constant {
-	if c := self.consts[index]; c != nil {
-		return c
-	}
-	panic(fmt.Sprintf("No constants at index %d", index))
 }
 
 func newConstantPool(class *Class, cfCp classfile.ConstantPool) *ConstantPool {
@@ -61,5 +51,13 @@ func newConstantPool(class *Class, cfCp classfile.ConstantPool) *ConstantPool {
 			// todo
 		}
 	}
+
 	return rtCp
+}
+
+func (self *ConstantPool) GetConstant(index uint) Constant {
+	if c := self.consts[index]; c != nil {
+		return c
+	}
+	panic(fmt.Sprintf("No constants at index %d", index))
 }

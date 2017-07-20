@@ -1,11 +1,11 @@
 package lang
 
-import (
-	"fmt"
-	"jvmgo/jvmgo/native"
-	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
-)
+import "fmt"
+import "jvmgo/jvmgo/native"
+import "jvmgo/jvmgo/rtda"
+import "jvmgo/jvmgo/rtda/heap"
+
+const jlThrowable = "java/lang/Throwable"
 
 type StackTraceElement struct {
 	fileName   string
@@ -14,10 +14,17 @@ type StackTraceElement struct {
 	lineNumber int
 }
 
-func init() {
-	native.Register("java/lang/Throwable", "fillInStackTrace", "(I)Ljava/lang/Throwable;", fillInStackTrace)
+func (self *StackTraceElement) String() string {
+	return fmt.Sprintf("%s.%s(%s:%d)",
+		self.className, self.methodName, self.fileName, self.lineNumber)
 }
 
+func init() {
+	native.Register(jlThrowable, "fillInStackTrace", "(I)Ljava/lang/Throwable;", fillInStackTrace)
+}
+
+// private native Throwable fillInStackTrace(int dummy);
+// (I)Ljava/lang/Throwable;
 func fillInStackTrace(frame *rtda.Frame) {
 	this := frame.LocalVars().GetThis()
 	frame.OperandStack().PushRef(this)
@@ -30,7 +37,6 @@ func createStackTraceElements(tObj *heap.Object, thread *rtda.Thread) []*StackTr
 	skip := distanceToObject(tObj.Class()) + 2
 	frames := thread.GetFrames()[skip:]
 	stes := make([]*StackTraceElement, len(frames))
-
 	for i, frame := range frames {
 		stes[i] = createStackTraceElement(frame)
 	}
@@ -54,9 +60,4 @@ func createStackTraceElement(frame *rtda.Frame) *StackTraceElement {
 		methodName: method.Name(),
 		lineNumber: method.GetLineNumber(frame.NextPC() - 1),
 	}
-}
-
-func (self *StackTraceElement) String() string {
-	return fmt.Sprintf("%s.%s(%s:%d)",
-		self.className, self.methodName, self.fileName, self.lineNumber)
 }
