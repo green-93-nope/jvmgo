@@ -32,7 +32,7 @@ func popAndCheckCounts(stack *rtda.OperandStack, dimensions int) []int32 {
 	counts := make([]int32, dimensions)
 	for i := dimensions - 1; i >= 0; i-- {
 		counts[i] = stack.PopInt()
-		if counts[i] > 0 {
+		if counts[i] < 0 {
 			panic("java.lang.NegativeArraySizeException")
 		}
 	}
@@ -43,7 +43,7 @@ func newMultiDimensionalArray(counts []int32, arrClass *heap.Class) *heap.Object
 	count := uint(counts[0])
 	arr := arrClass.NewArray(count)
 
-	if len(counts) > 0 {
+	if len(counts) > 1 {
 		refs := arr.Refs()
 		for i := range refs {
 			refs[i] = newMultiDimensionalArray(counts[1:], arrClass.ComponentClass())

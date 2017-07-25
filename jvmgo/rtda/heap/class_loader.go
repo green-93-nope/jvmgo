@@ -12,33 +12,57 @@ class names:
     - array classes: [Ljava/lang/Object; ...
 */
 type ClassLoader struct {
-	cp          *classpath.Classpath
 	verboseFlag bool
+	parent      *ClassLoader
+	readFun     classpath.ReadFunction
 	classMap    map[string]*Class // loaded classes
 }
 
+var bootstrap_classloader *ClassLoader
+var extension_classloader *ClassLoader
+var application_classloader *ClassLoader
+
 func NewClassLoader(cp *classpath.Classpath, verboseFlag bool) *ClassLoader {
-	loader := &ClassLoader{
-		cp:          cp,
+	bootstrap_classloader = &ClassLoader{
 		verboseFlag: verboseFlag,
+		parent:      nil,
+		readFun:     cp.ReadBootClass,
 		classMap:    make(map[string]*Class),
 	}
 
-	loader.loadBasicClasses()
-	loader.loadPrimitiveClasses()
-	return loader
+	extension_classloader = &ClassLoader{
+		verboseFlag: verboseFlag,
+		parent:      bootstrap_classloader,
+		readFun:     cp.ReadExtClass,
+		classMap:    make(map[string]*Class),
+	}
+
+	application_classloader = &ClassLoader{
+		verboseFlag: verboseFlag,
+		parent:      extension_classloader,
+		readFun:     cp.ReadUserClass,
+		classMap:    make(map[string]*Class),
+	}
+
+	bootstrap_classloader.loadBasicClasses()
+	bootstrap_classloader.loadPrimitiveClasses()
+	return application_classloader
 }
 
 func (self *ClassLoader) loadBasicClasses() {
 	jlClassClass := self.LoadClass("java/lang/Class")
+	// set the jClass and its extra of the class when first load "java/lang/Class"
 	for _, class := range self.classMap {
 		if class.jClass == nil {
+			// jClass is the instance of class struct
 			class.jClass = jlClassClass.NewObject()
+			// extra is the instance of which class
 			class.jClass.extra = class
 		}
 	}
 }
 
+// load classes of basic type
 func (self *ClassLoader) loadPrimitiveClasses() {
 	for primitiveType, _ := range primitiveTypes {
 		self.loadPrimitiveClass(primitiveType)
@@ -52,17 +76,43 @@ func (self *ClassLoader) loadPrimitiveClass(className string) {
 		loader:      self,
 		initStarted: true,
 	}
+	// jClass is the object of type "java/lang/Class"
 	class.jClass = self.classMap["java/lang/Class"].NewObject()
 	class.jClass.extra = class
 	self.classMap[className] = class
 }
 
 func (self *ClassLoader) LoadClass(name string) *Class {
-	if class, ok := self.classMap[name]; ok {
-		// already loaded
-		return class
+	if c := self.findLoadedClass(name); c != nil {
+		return c
 	}
 
+	if self.parent != nil {
+		if c := self.parent.LoadClass(name); c != nil {
+			return c
+		}
+	}
+	c := self.findClass(name)
+	return c
+}
+
+func (self *ClassLoader) findLoadedClass(name string) *Class {
+	if self.parent != nil {
+		if c := self.parent.findLoadedClass(name); c != nil {
+			return c
+		}
+	}
+
+	for key, v := range self.classMap {
+		if key == name {
+			return v
+		}
+	}
+	return nil
+}
+
+// to use user defined classloader, this class should be override
+func (self *ClassLoader) findClass(name string) *Class {
 	var class *Class
 	if name[0] == '[' { // array class
 		class = self.loadArrayClass(name)
@@ -70,7 +120,12 @@ func (self *ClassLoader) LoadClass(name string) *Class {
 		class = self.loadNonArrayClass(name)
 	}
 
-	if jlClassClass, ok := self.classMap["java/lang/Class"]; ok {
+	if class == nil {
+		// can not load
+		return nil
+	}
+
+	if jlClassClass := self.findLoadedClass("java/lang/Class"); jlClassClass != nil {
 		class.jClass = jlClassClass.NewObject()
 		class.jClass.extra = class
 	}
@@ -95,7 +150,12 @@ func (self *ClassLoader) loadArrayClass(name string) *Class {
 }
 
 func (self *ClassLoader) loadNonArrayClass(name string) *Class {
-	data, entry := self.readClass(name)
+	data, entry, err := self.readFun(name)
+
+	if err != nil {
+		return nil
+	}
+
 	class := self.defineClass(data)
 	link(class)
 
@@ -104,14 +164,6 @@ func (self *ClassLoader) loadNonArrayClass(name string) *Class {
 	}
 
 	return class
-}
-
-func (self *ClassLoader) readClass(name string) ([]byte, classpath.Entry) {
-	data, entry, err := self.cp.ReadClass(name)
-	if err != nil {
-		panic("java.lang.ClassNotFoundException: " + name)
-	}
-	return data, entry
 }
 
 // jvms 5.3.5
