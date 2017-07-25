@@ -1,0 +1,25 @@
+* jvmgo
+jvmgo is a toy Java Virtual Machine (JVM) written in go programming language.
+
+The idea and basic implementation is learned from the book: 《自己动手写Java虚拟机》.
+In my implementation, jvmgo have:
++ The bytecode interpreter
++ support 199 instructions defined by JVM Spec
++ classloader with parents delegation model
++ parts of the JVM's native interface
+
+* Build jvmgo
+#+BEGIN_EXAMPLE
+go get github.com/green-93-nope/jvmgo
+#+END_EXAMPLE
+
+* Run jvmgo
+#+BEGIN_EXAMPLE
+jvmgo [-Xjre path/to/jre] [-cp path/to/classes] classname
+#+END_EXAMPLE
++ Xjre is to specify the path of jre, without this argument jvmgo will use JAVA_HOME
++ cp is to specify the path of classes, the default is current directory
+
+* Ongoing work
++ support multiple thread model
++ add garbage collector instead of using golang's gc
