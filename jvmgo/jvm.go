@@ -18,10 +18,12 @@ type JVM struct {
 func newJVM(cmd *Cmd) *JVM {
 	cp := classpath.Parse(cmd.XjreOption, cmd.cpOption)
 	classLoader := heap.NewClassLoader(cp, cmd.verboseClassFlag)
+	mainThread := rtda.NewThread()
+	rtda.InitObjects(mainThread)
 	return &JVM{
 		cmd:         cmd,
 		classLoader: classLoader,
-		mainThread:  rtda.NewThread(),
+		mainThread:  mainThread,
 	}
 }
 

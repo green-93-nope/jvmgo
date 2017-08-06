@@ -167,11 +167,6 @@ func (self *Class) isJlCloneable() bool {
 func (self *Class) isJioSerializable() bool {
 	return self.name == "java/io/Serializable"
 }
-
-func (self *Class) NewObject() *Object {
-	return newObject(self)
-}
-
 func (self *Class) ArrayClass() *Class {
 	arrayClassName := getArrayClassName(self.name)
 	return self.loader.LoadClass(arrayClassName)

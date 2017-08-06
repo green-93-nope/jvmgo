@@ -4,14 +4,32 @@ type Object struct {
 	class *Class
 	data  interface{} // Slots for Object, []int32 for int[] ...
 	extra interface{}
+	mark  int
+	next  *Object
 }
 
 // create normal (non-array) object
-func newObject(class *Class) *Object {
+func OneNewObject(class *Class) *Object {
 	return &Object{
 		class: class,
 		data:  newSlots(class.instanceSlotCount),
 	}
+}
+
+func (self *Object) Next() *Object {
+	return self.next
+}
+
+func (self *Object) Mark() int {
+	return self.mark
+}
+
+func (self *Object) SetNext(next *Object) {
+	self.next = next
+}
+
+func (self *Object) SetMark(mark int) {
+	self.mark = mark
 }
 
 // getters & setters

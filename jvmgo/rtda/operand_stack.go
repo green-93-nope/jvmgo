@@ -17,6 +17,14 @@ func newOperandStack(maxStack uint) *OperandStack {
 	return nil
 }
 
+func (self *OperandStack) GetSize() uint {
+	return self.size
+}
+
+func (self *OperandStack) GetObject(i uint) *heap.Object {
+	return self.slots[i].ref
+}
+
 func (self *OperandStack) PushInt(val int32) {
 	self.slots[self.size].num = val
 	self.size++

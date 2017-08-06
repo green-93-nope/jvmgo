@@ -1,6 +1,8 @@
 package rtda
 
-import "jvmgo/jvmgo/rtda/heap"
+import (
+	"jvmgo/jvmgo/rtda/heap"
+)
 
 /*
 JVM
@@ -14,7 +16,6 @@ JVM
 type Thread struct {
 	pc    int // the address of the instruction currently being executed
 	stack *Stack
-	// todo
 }
 
 func NewThread() *Thread {
