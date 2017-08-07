@@ -7,6 +7,7 @@ In my implementation, jvmgo have:
 + The bytecode interpreter
 + support 199 instructions defined by JVM Spec
 + classloader with parents delegation model
++ using my own garbage collector(reference counting + mark-sweep)
 + parts of the JVM's native interface
 
 * Build jvmgo
@@ -23,4 +24,4 @@ jvmgo [-Xjre path/to/jre] [-cp path/to/classes] classname
 
 * Ongoing work
 + support multiple thread model
-+ add garbage collector instead of using golang's gc
++ optimize our own garbage collector
