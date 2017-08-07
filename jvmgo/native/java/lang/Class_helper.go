@@ -1,10 +1,10 @@
 package lang
 
 import "unsafe"
-import "jvmgo/jvmgo/rtda/heap"
+import "jvmgo/jvmgo/rtda"
 
 // []*Class => Class[]
-func toClassArr(loader *heap.ClassLoader, classes []*heap.Class) *heap.Object {
+func toClassArr(loader *rtda.ClassLoader, classes []*rtda.Class) *rtda.Object {
 	arrLen := len(classes)
 
 	classArrClass := loader.LoadClass("java/lang/Class").ArrayClass()
@@ -21,10 +21,10 @@ func toClassArr(loader *heap.ClassLoader, classes []*heap.Class) *heap.Object {
 }
 
 // []byte => byte[]
-func toByteArr(loader *heap.ClassLoader, goBytes []byte) *heap.Object {
+func toByteArr(loader *rtda.ClassLoader, goBytes []byte) *rtda.Object {
 	if goBytes != nil {
 		jBytes := castUint8sToInt8s(goBytes)
-		return heap.NewByteArray(loader, jBytes)
+		return rtda.NewByteArray(loader, jBytes)
 	}
 	return nil
 }
@@ -34,9 +34,9 @@ func castUint8sToInt8s(goBytes []byte) (jBytes []int8) {
 	return
 }
 
-func getSignatureStr(loader *heap.ClassLoader, signature string) *heap.Object {
+func getSignatureStr(loader *rtda.ClassLoader, signature string) *rtda.Object {
 	if signature != "" {
-		return heap.JString(loader, signature)
+		return rtda.JString(loader, signature)
 	}
 	return nil
 }

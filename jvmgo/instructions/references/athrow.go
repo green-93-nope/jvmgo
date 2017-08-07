@@ -3,7 +3,6 @@ package references
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 	"reflect"
 )
 
@@ -21,7 +20,7 @@ func (self *ATHROW) Execute(frame *rtda.Frame) {
 	}
 }
 
-func findAndGotoExceptionHandler(thread *rtda.Thread, ex *heap.Object) bool {
+func findAndGotoExceptionHandler(thread *rtda.Thread, ex *rtda.Object) bool {
 	for {
 		frame := thread.CurrentFrame()
 		pc := frame.NextPC() - 1
@@ -43,11 +42,11 @@ func findAndGotoExceptionHandler(thread *rtda.Thread, ex *heap.Object) bool {
 	return false
 }
 
-func handlerUncaughtException(thread *rtda.Thread, ex *heap.Object) {
+func handlerUncaughtException(thread *rtda.Thread, ex *rtda.Object) {
 	thread.ClearStack()
 
 	jMsg := ex.GetRefVar("detailMessage", "Ljava/lang/String;")
-	goMsg := heap.GoString(jMsg)
+	goMsg := rtda.GoString(jMsg)
 	println(ex.Class().JavaName() + ": " + goMsg)
 
 	stes := reflect.ValueOf(ex.Extra())

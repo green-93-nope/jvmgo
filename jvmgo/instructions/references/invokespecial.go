@@ -3,7 +3,6 @@ package references
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 )
 
 type INVOKE_SPECIAL struct{ base.Index16Instruction }
@@ -11,7 +10,7 @@ type INVOKE_SPECIAL struct{ base.Index16Instruction }
 func (self *INVOKE_SPECIAL) Execute(frame *rtda.Frame) {
 	currentClass := frame.Method().Class()
 	cp := currentClass.ConstantPool()
-	methodRef := cp.GetConstant(self.Index).(*heap.MethodRef)
+	methodRef := cp.GetConstant(self.Index).(*rtda.MethodRef)
 	resolvedClass := methodRef.ResolvedClass()
 	resolvedMethod := methodRef.ResolvedMethod()
 
@@ -40,7 +39,7 @@ func (self *INVOKE_SPECIAL) Execute(frame *rtda.Frame) {
 	if currentClass.IsSuper() &&
 		resolvedClass.IsSuperClassOf(currentClass) &&
 		resolvedMethod.Name() != "<init>" {
-		methodToBeInvoked = heap.LookupMethodInClass(currentClass.SuperClass(), methodRef.Name(), methodRef.Descriptor())
+		methodToBeInvoked = rtda.LookupMethodInClass(currentClass.SuperClass(), methodRef.Name(), methodRef.Descriptor())
 	}
 
 	if methodToBeInvoked == nil || methodToBeInvoked.IsAbstract() {

@@ -5,7 +5,6 @@ import "time"
 import "jvmgo/jvmgo/instructions/base"
 import "jvmgo/jvmgo/native"
 import "jvmgo/jvmgo/rtda"
-import "jvmgo/jvmgo/rtda/heap"
 
 const jlSystem = "java/lang/System"
 
@@ -40,10 +39,10 @@ func arraycopy(frame *rtda.Frame) {
 		panic("java.lang.IndexOutOfBoundsException")
 	}
 
-	heap.ArrayCopy(src, dest, srcPos, destPos, length)
+	rtda.ArrayCopy(src, dest, srcPos, destPos, length)
 }
 
-func checkArrayCopy(src, dest *heap.Object) bool {
+func checkArrayCopy(src, dest *rtda.Object) bool {
 	srcClass := src.Class()
 	destClass := dest.Class()
 
@@ -70,8 +69,8 @@ func initProperties(frame *rtda.Frame) {
 	setPropMethod := props.Class().GetInstanceMethod("setProperty", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;")
 	thread := frame.Thread()
 	for key, val := range _sysProps() {
-		jKey := heap.JString(frame.Method().Class().Loader(), key)
-		jVal := heap.JString(frame.Method().Class().Loader(), val)
+		jKey := rtda.JString(frame.Method().Class().Loader(), key)
+		jVal := rtda.JString(frame.Method().Class().Loader(), val)
 		ops := rtda.NewOperandStack(3)
 		ops.PushRef(props)
 		ops.PushRef(jKey)

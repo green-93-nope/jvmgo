@@ -4,7 +4,6 @@ import "path/filepath"
 import "os"
 import "jvmgo/jvmgo/native"
 import "jvmgo/jvmgo/rtda"
-import "jvmgo/jvmgo/rtda/heap"
 
 const unixfs = "java/io/UnixFileSystem"
 
@@ -21,10 +20,10 @@ func canonicalize0(frame *rtda.Frame) {
 	path := vars.GetRef(1)
 
 	// todo
-	goPath := heap.GoString(path)
+	goPath := rtda.GoString(path)
 	goPath2 := filepath.Clean(goPath)
 	if goPath2 != goPath {
-		path = heap.JString(frame.Method().Class().Loader(), goPath2)
+		path = rtda.JString(frame.Method().Class().Loader(), goPath2)
 	}
 
 	stack := frame.OperandStack()
@@ -51,9 +50,9 @@ func getBooleanAttributes0(frame *rtda.Frame) {
 	stack.PushInt(int32(attributes0))
 }
 
-func _getPath(fileObj *heap.Object) string {
+func _getPath(fileObj *rtda.Object) string {
 	pathStr := fileObj.GetRefVar("path", "Ljava/lang/String;")
-	return heap.GoString(pathStr)
+	return rtda.GoString(pathStr)
 }
 
 // http://stackoverflow.com/questions/10510691/how-to-check-whether-a-file-or-directory-denoted-by-a-path-exists-in-golang

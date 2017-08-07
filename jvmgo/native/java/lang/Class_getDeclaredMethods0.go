@@ -2,7 +2,6 @@ package lang
 
 import "jvmgo/jvmgo/instructions/base"
 import "jvmgo/jvmgo/rtda"
-import "jvmgo/jvmgo/rtda/heap"
 
 /*
 Method(Class<?> declaringClass,
@@ -34,7 +33,7 @@ func getDeclaredMethods0(frame *rtda.Frame) {
 	classObj := vars.GetThis()
 	publicOnly := vars.GetBoolean(1)
 
-	class := classObj.Extra().(*heap.Class)
+	class := classObj.Extra().(*rtda.Class)
 	methods := class.GetMethods(publicOnly)
 	methodCount := uint(len(methods))
 
@@ -58,7 +57,7 @@ func getDeclaredMethods0(frame *rtda.Frame) {
 			ops := rtda.NewOperandStack(12)
 			ops.PushRef(methodObj)                                                // this
 			ops.PushRef(classObj)                                                 // declaringClass
-			ops.PushRef(heap.JString(classLoader, method.Name()))                 // name
+			ops.PushRef(rtda.JString(classLoader, method.Name()))                 // name
 			ops.PushRef(toClassArr(classLoader, method.ParameterTypes()))         // parameterTypes
 			ops.PushRef(method.ReturnType().JClass())                             // returnType
 			ops.PushRef(toClassArr(classLoader, method.ExceptionTypes()))         // checkedExceptions

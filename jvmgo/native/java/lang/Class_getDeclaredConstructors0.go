@@ -2,7 +2,6 @@ package lang
 
 import "jvmgo/jvmgo/instructions/base"
 import "jvmgo/jvmgo/rtda"
-import "jvmgo/jvmgo/rtda/heap"
 
 /*
 Constructor(Class<T> declaringClass,
@@ -30,7 +29,7 @@ func getDeclaredConstructors0(frame *rtda.Frame) {
 	classObj := vars.GetThis()
 	publicOnly := vars.GetBoolean(1)
 
-	class := classObj.Extra().(*heap.Class)
+	class := classObj.Extra().(*rtda.Class)
 	constructors := class.GetConstructors(publicOnly)
 	constructorCount := uint(len(constructors))
 

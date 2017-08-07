@@ -3,14 +3,13 @@ package references
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 )
 
 type GET_STATIC struct{ base.Index16Instruction }
 
 func (self *GET_STATIC) Execute(frame *rtda.Frame) {
 	cp := frame.Method().Class().ConstantPool()
-	fieldRef := cp.GetConstant(self.Index).(*heap.FieldRef)
+	fieldRef := cp.GetConstant(self.Index).(*rtda.FieldRef)
 	field := fieldRef.ResolvedField()
 	class := field.Class()
 

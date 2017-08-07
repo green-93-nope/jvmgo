@@ -3,7 +3,6 @@ package references
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 )
 
 // Create new multidimensional array
@@ -19,7 +18,7 @@ func (self *MULTI_ANEW_ARRAY) FetchOperands(reader *base.BytecodeReader) {
 
 func (self *MULTI_ANEW_ARRAY) Execute(frame *rtda.Frame) {
 	cp := frame.Method().Class().ConstantPool()
-	classRef := cp.GetConstant(uint(self.index)).(*heap.ClassRef)
+	classRef := cp.GetConstant(uint(self.index)).(*rtda.ClassRef)
 	arrClass := classRef.ResolvedClass()
 
 	stack := frame.OperandStack()
@@ -39,7 +38,7 @@ func popAndCheckCounts(stack *rtda.OperandStack, dimensions int) []int32 {
 	return counts
 }
 
-func newMultiDimensionalArray(counts []int32, arrClass *heap.Class) *heap.Object {
+func newMultiDimensionalArray(counts []int32, arrClass *rtda.Class) *rtda.Object {
 	count := uint(counts[0])
 	arr := arrClass.NewArray(count)
 

@@ -3,7 +3,6 @@ package references
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 )
 
 type INSTANCE_OF struct{ base.Index16Instruction }
@@ -17,7 +16,7 @@ func (self *INSTANCE_OF) Execute(frame *rtda.Frame) {
 	}
 
 	cp := frame.Method().Class().ConstantPool()
-	classRef := cp.GetConstant(self.Index).(*heap.ClassRef)
+	classRef := cp.GetConstant(self.Index).(*rtda.ClassRef)
 	class := classRef.ResolvedClass()
 	if ref.IsInstanceOf(class) {
 		stack.PushInt(1)

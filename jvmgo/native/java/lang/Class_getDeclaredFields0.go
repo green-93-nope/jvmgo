@@ -2,7 +2,6 @@ package lang
 
 import "jvmgo/jvmgo/instructions/base"
 import "jvmgo/jvmgo/rtda"
-import "jvmgo/jvmgo/rtda/heap"
 
 /*
 Field(Class<?> declaringClass,
@@ -28,7 +27,7 @@ func getDeclaredFields0(frame *rtda.Frame) {
 	classObj := vars.GetThis()
 	publicOnly := vars.GetBoolean(1)
 
-	class := classObj.Extra().(*heap.Class)
+	class := classObj.Extra().(*rtda.Class)
 	fields := class.GetFields(publicOnly)
 	fieldCount := uint(len(fields))
 
@@ -51,7 +50,7 @@ func getDeclaredFields0(frame *rtda.Frame) {
 			ops := rtda.NewOperandStack(8)
 			ops.PushRef(fieldObj)                                          // this
 			ops.PushRef(classObj)                                          // declaringClass
-			ops.PushRef(heap.JString(classLoader, goField.Name()))         // name
+			ops.PushRef(rtda.JString(classLoader, goField.Name()))         // name
 			ops.PushRef(goField.Type().JClass())                           // type
 			ops.PushInt(int32(goField.AccessFlags()))                      // modifiers
 			ops.PushInt(int32(goField.SlotId()))                           // slot

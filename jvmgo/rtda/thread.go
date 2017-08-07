@@ -1,9 +1,5 @@
 package rtda
 
-import (
-	"jvmgo/jvmgo/rtda/heap"
-)
-
 /*
 JVM
   Thread
@@ -55,6 +51,6 @@ func (self *Thread) ClearStack() {
 	self.stack.clear()
 }
 
-func (self *Thread) NewFrame(method *heap.Method) *Frame {
+func (self *Thread) NewFrame(method *Method) *Frame {
 	return newFrame(self, method)
 }

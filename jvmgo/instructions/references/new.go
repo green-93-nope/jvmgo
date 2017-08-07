@@ -3,14 +3,13 @@ package references
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 )
 
 type NEW struct{ base.Index16Instruction }
 
 func (self *NEW) Execute(frame *rtda.Frame) {
 	cp := frame.Method().Class().ConstantPool()
-	classRef := cp.GetConstant(self.Index).(*heap.ClassRef)
+	classRef := cp.GetConstant(self.Index).(*rtda.ClassRef)
 	class := classRef.ResolvedClass()
 
 	if !class.InitStarted() {

@@ -2,7 +2,6 @@ package lang
 
 import "jvmgo/jvmgo/native"
 import "jvmgo/jvmgo/rtda"
-import "jvmgo/jvmgo/rtda/heap"
 
 const jlString = "java/lang/String"
 
@@ -14,6 +13,6 @@ func init() {
 // ()Ljava/lang/String;
 func intern(frame *rtda.Frame) {
 	this := frame.LocalVars().GetThis()
-	interned := heap.InternString(this)
+	interned := rtda.InternString(this)
 	frame.OperandStack().PushRef(interned)
 }

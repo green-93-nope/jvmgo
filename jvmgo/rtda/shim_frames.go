@@ -1,16 +1,14 @@
 package rtda
 
-import "jvmgo/jvmgo/rtda/heap"
-
 func NewShimFrame(thread *Thread, ops *OperandStack) *Frame {
 	return &Frame{
 		thread:       thread,
-		method:       heap.ShimReturnMethod(),
+		method:       ShimReturnMethod(),
 		operandStack: ops,
 	}
 }
 
-//func newAthrowFrame(thread *Thread, ex *heap.Object, initArgs []interface{}) *Frame {
+//func newAthrowFrame(thread *Thread, ex *Object, initArgs []interface{}) *Frame {
 //	// stackSlots := [ex, ex, initArgs]
 //	stackSlots := make([]interface{}, len(initArgs)+2)
 //	stackSlots[0] = ex
@@ -19,7 +17,7 @@ func NewShimFrame(thread *Thread, ops *OperandStack) *Frame {
 //
 //	frame := &Frame{}
 //	frame.thread = thread
-//	frame.method = heap.AthrowMethod()
+//	frame.method = AthrowMethod()
 //	frame.operandStack = &OperandStack{
 //		size:  uint(len(stackSlots)),
 //		slots: stackSlots,

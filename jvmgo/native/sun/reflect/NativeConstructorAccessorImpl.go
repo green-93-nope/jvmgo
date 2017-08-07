@@ -3,7 +3,6 @@ package reflect
 import "jvmgo/jvmgo/instructions/base"
 import "jvmgo/jvmgo/native"
 import "jvmgo/jvmgo/rtda"
-import "jvmgo/jvmgo/rtda/heap"
 
 func init() {
 	native.Register("sun/reflect/NativeConstructorAccessorImpl", "newInstance0", "(Ljava/lang/reflect/Constructor;[Ljava/lang/Object;)Ljava/lang/Object;", newInstance0)
@@ -37,29 +36,29 @@ func newInstance0(frame *rtda.Frame) {
 	base.InvokeMethod(shimFrame, goConstructor)
 }
 
-func getGoMethod(methodObj *heap.Object) *heap.Method {
+func getGoMethod(methodObj *rtda.Object) *rtda.Method {
 	return _getGoMethod(methodObj, false)
 }
-func getGoConstructor(constructorObj *heap.Object) *heap.Method {
+func getGoConstructor(constructorObj *rtda.Object) *rtda.Method {
 	return _getGoMethod(constructorObj, true)
 }
-func _getGoMethod(methodObj *heap.Object, isConstructor bool) *heap.Method {
+func _getGoMethod(methodObj *rtda.Object, isConstructor bool) *rtda.Method {
 	extra := methodObj.Extra()
 	if extra != nil {
-		return extra.(*heap.Method)
+		return extra.(*rtda.Method)
 	}
 
 	if isConstructor {
 		root := methodObj.GetRefVar("root", "Ljava/lang/reflect/Constructor;")
-		return root.Extra().(*heap.Method)
+		return root.Extra().(*rtda.Method)
 	} else {
 		root := methodObj.GetRefVar("root", "Ljava/lang/reflect/Method;")
-		return root.Extra().(*heap.Method)
+		return root.Extra().(*rtda.Method)
 	}
 }
 
 // Object[] -> []interface{}
-func convertArgs(this, argArr *heap.Object, method *heap.Method) *rtda.OperandStack {
+func convertArgs(this, argArr *rtda.Object, method *rtda.Method) *rtda.OperandStack {
 	if method.ArgSlotCount() == 0 {
 		return nil
 	}

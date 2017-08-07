@@ -2,7 +2,6 @@ package misc
 
 import "jvmgo/jvmgo/native"
 import "jvmgo/jvmgo/rtda"
-import "jvmgo/jvmgo/rtda/heap"
 
 const miscUnsafe = "sun/misc/Unsafe"
 
@@ -66,11 +65,11 @@ func compareAndSwapObject(frame *rtda.Frame) {
 	newVal := vars.GetRef(5)
 
 	// todo
-	if anys, ok := fields.(heap.Slots); ok {
+	if anys, ok := fields.(rtda.Slots); ok {
 		// object
 		swapped := _casObj(obj, anys, offset, expected, newVal)
 		frame.OperandStack().PushBoolean(swapped)
-	} else if objs, ok := fields.([]*heap.Object); ok {
+	} else if objs, ok := fields.([]*rtda.Object); ok {
 		// ref[]
 		swapped := _casArr(objs, offset, expected, newVal)
 		frame.OperandStack().PushBoolean(swapped)
@@ -79,7 +78,7 @@ func compareAndSwapObject(frame *rtda.Frame) {
 		panic("todo: compareAndSwapObject!")
 	}
 }
-func _casObj(obj *heap.Object, fields heap.Slots, offset int64, expected, newVal *heap.Object) bool {
+func _casObj(obj *rtda.Object, fields rtda.Slots, offset int64, expected, newVal *rtda.Object) bool {
 	current := fields.GetRef(uint(offset))
 	if current == expected {
 		fields.SetRef(uint(offset), newVal)
@@ -88,7 +87,7 @@ func _casObj(obj *heap.Object, fields heap.Slots, offset int64, expected, newVal
 		return false
 	}
 }
-func _casArr(objs []*heap.Object, offset int64, expected, newVal *heap.Object) bool {
+func _casArr(objs []*rtda.Object, offset int64, expected, newVal *rtda.Object) bool {
 	current := objs[offset]
 	if current == expected {
 		objs[offset] = newVal
@@ -106,7 +105,7 @@ func getInt(frame *rtda.Frame) {
 	offset := vars.GetLong(2)
 
 	stack := frame.OperandStack()
-	if slots, ok := fields.(heap.Slots); ok {
+	if slots, ok := fields.(rtda.Slots); ok {
 		// object
 		stack.PushInt(slots.GetInt(uint(offset)))
 	} else if shorts, ok := fields.([]int32); ok {
@@ -126,7 +125,7 @@ func compareAndSwapInt(frame *rtda.Frame) {
 	expected := vars.GetInt(4)
 	newVal := vars.GetInt(5)
 
-	if slots, ok := fields.(heap.Slots); ok {
+	if slots, ok := fields.(rtda.Slots); ok {
 		// object
 		oldVal := slots.GetInt(uint(offset))
 		if oldVal == expected {
@@ -157,11 +156,11 @@ func getObject(frame *rtda.Frame) {
 	fields := vars.GetRef(1).Data()
 	offset := vars.GetLong(2)
 
-	if anys, ok := fields.(heap.Slots); ok {
+	if anys, ok := fields.(rtda.Slots); ok {
 		// object
 		x := anys.GetRef(uint(offset))
 		frame.OperandStack().PushRef(x)
-	} else if objs, ok := fields.([]*heap.Object); ok {
+	} else if objs, ok := fields.([]*rtda.Object); ok {
 		// ref[]
 		x := objs[offset]
 		frame.OperandStack().PushRef(x)
@@ -179,7 +178,7 @@ func compareAndSwapLong(frame *rtda.Frame) {
 	expected := vars.GetLong(4)
 	newVal := vars.GetLong(6)
 
-	if slots, ok := fields.(heap.Slots); ok {
+	if slots, ok := fields.(rtda.Slots); ok {
 		// object
 		oldVal := slots.GetLong(uint(offset))
 		if oldVal == expected {

@@ -1,7 +1,6 @@
 package rtda
 
 import "math"
-import "jvmgo/jvmgo/rtda/heap"
 
 type OperandStack struct {
 	size  uint
@@ -21,7 +20,7 @@ func (self *OperandStack) GetSize() uint {
 	return self.size
 }
 
-func (self *OperandStack) GetObject(i uint) *heap.Object {
+func (self *OperandStack) GetObject(i uint) *Object {
 	return self.slots[i].ref
 }
 
@@ -68,11 +67,11 @@ func (self *OperandStack) PopDouble() float64 {
 	return math.Float64frombits(bits)
 }
 
-func (self *OperandStack) PushRef(ref *heap.Object) {
+func (self *OperandStack) PushRef(ref *Object) {
 	self.slots[self.size].ref = ref
 	self.size++
 }
-func (self *OperandStack) PopRef() *heap.Object {
+func (self *OperandStack) PopRef() *Object {
 	self.size--
 	ref := self.slots[self.size].ref
 	self.slots[self.size].ref = nil
@@ -94,7 +93,7 @@ func (self *OperandStack) Clear() {
 	}
 }
 
-func (self *OperandStack) GetRefFromTop(n uint) *heap.Object {
+func (self *OperandStack) GetRefFromTop(n uint) *Object {
 	return self.slots[self.size-1-n].ref
 }
 

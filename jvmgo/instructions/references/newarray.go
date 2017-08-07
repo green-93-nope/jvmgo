@@ -3,7 +3,6 @@ package references
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 )
 
 const (
@@ -39,7 +38,7 @@ func (self *NEW_ARRAY) Execute(frame *rtda.Frame) {
 	stack.PushRef(arr)
 }
 
-func getPrimitiveArrayClass(loader *heap.ClassLoader, atype uint8) *heap.Class {
+func getPrimitiveArrayClass(loader *rtda.ClassLoader, atype uint8) *rtda.Class {
 	switch atype {
 	case AT_BOOLEAN:
 		return loader.LoadClass("[Z")

@@ -3,7 +3,6 @@ package loads
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 )
 
 // Load reference from array
@@ -118,7 +117,7 @@ func (self *SALOAD) Execute(frame *rtda.Frame) {
 	stack.PushInt(int32(shorts[index]))
 }
 
-func checkNotNil(ref *heap.Object) {
+func checkNotNil(ref *rtda.Object) {
 	if ref == nil {
 		panic("java.lang.NullPointerException")
 	}

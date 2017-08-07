@@ -2,10 +2,9 @@ package base
 
 import (
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 )
 
-func InvokeMethod(invokerFrame *rtda.Frame, method *heap.Method) {
+func InvokeMethod(invokerFrame *rtda.Frame, method *rtda.Method) {
 	thread := invokerFrame.Thread()
 	newFrame := thread.NewFrame(method)
 	thread.PushFrame(newFrame)

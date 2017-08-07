@@ -3,7 +3,6 @@ package references
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 )
 
 // Create new array of reference
@@ -11,7 +10,7 @@ type ANEW_ARRAY struct{ base.Index16Instruction }
 
 func (self *ANEW_ARRAY) Execute(frame *rtda.Frame) {
 	cp := frame.Method().Class().ConstantPool()
-	classRef := cp.GetConstant(self.Index).(*heap.ClassRef)
+	classRef := cp.GetConstant(self.Index).(*rtda.ClassRef)
 	componentClass := classRef.ResolvedClass()
 
 	stack := frame.OperandStack()

@@ -3,7 +3,6 @@ package lang
 import "fmt"
 import "jvmgo/jvmgo/native"
 import "jvmgo/jvmgo/rtda"
-import "jvmgo/jvmgo/rtda/heap"
 
 const jlThrowable = "java/lang/Throwable"
 
@@ -33,7 +32,7 @@ func fillInStackTrace(frame *rtda.Frame) {
 	this.SetExtra(stes)
 }
 
-func createStackTraceElements(tObj *heap.Object, thread *rtda.Thread) []*StackTraceElement {
+func createStackTraceElements(tObj *rtda.Object, thread *rtda.Thread) []*StackTraceElement {
 	skip := distanceToObject(tObj.Class()) + 2
 	frames := thread.GetFrames()[skip:]
 	stes := make([]*StackTraceElement, len(frames))
@@ -43,7 +42,7 @@ func createStackTraceElements(tObj *heap.Object, thread *rtda.Thread) []*StackTr
 	return stes
 }
 
-func distanceToObject(class *heap.Class) int {
+func distanceToObject(class *rtda.Class) int {
 	distance := 0
 	for c := class.SuperClass(); c != nil; c = c.SuperClass() {
 		distance++

@@ -3,7 +3,6 @@ package references
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 )
 
 type INVOKE_VIRTUAL struct{ base.Index16Instruction }
@@ -11,7 +10,7 @@ type INVOKE_VIRTUAL struct{ base.Index16Instruction }
 func (self *INVOKE_VIRTUAL) Execute(frame *rtda.Frame) {
 	currentClass := frame.Method().Class()
 	cp := currentClass.ConstantPool()
-	methodRef := cp.GetConstant(self.Index).(*heap.MethodRef)
+	methodRef := cp.GetConstant(self.Index).(*rtda.MethodRef)
 	resolvedMethod := methodRef.ResolvedMethod()
 	if resolvedMethod.IsStatic() {
 		panic("java.lang.IncompatibleClassChangeError")
@@ -33,7 +32,7 @@ func (self *INVOKE_VIRTUAL) Execute(frame *rtda.Frame) {
 
 	}
 
-	methodToBeInvoked := heap.LookupMethodInClass(ref.Class(), methodRef.Name(), methodRef.Descriptor())
+	methodToBeInvoked := rtda.LookupMethodInClass(ref.Class(), methodRef.Name(), methodRef.Descriptor())
 	if methodToBeInvoked == nil || methodToBeInvoked.IsAbstract() {
 		panic("java.lang.AbstractMethodError")
 	}

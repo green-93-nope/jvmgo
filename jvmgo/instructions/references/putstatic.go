@@ -3,7 +3,6 @@ package references
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 )
 
 type PUT_STATIC struct{ base.Index16Instruction }
@@ -12,7 +11,7 @@ func (self *PUT_STATIC) Execute(frame *rtda.Frame) {
 	currentMethod := frame.Method()
 	currentClass := currentMethod.Class()
 	cp := currentClass.ConstantPool()
-	fieldRef := cp.GetConstant(self.Index).(*heap.FieldRef)
+	fieldRef := cp.GetConstant(self.Index).(*rtda.FieldRef)
 	field := fieldRef.ResolvedField()
 	class := field.Class()
 

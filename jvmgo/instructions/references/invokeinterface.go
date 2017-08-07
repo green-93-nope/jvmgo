@@ -3,7 +3,6 @@ package references
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 )
 
 type INVOKE_INTERFACE struct {
@@ -20,7 +19,7 @@ func (self *INVOKE_INTERFACE) FetchOperands(reader *base.BytecodeReader) {
 
 func (self *INVOKE_INTERFACE) Execute(frame *rtda.Frame) {
 	cp := frame.Method().Class().ConstantPool()
-	methodRef := cp.GetConstant(self.index).(*heap.InterfaceMethodRef)
+	methodRef := cp.GetConstant(self.index).(*rtda.InterfaceMethodRef)
 	resolvedMethod := methodRef.ResolvedInterfaceMethod()
 	if resolvedMethod.IsStatic() || resolvedMethod.IsPrivate() {
 		panic("java.lang.IncompatibleClassChangeError")
@@ -34,7 +33,7 @@ func (self *INVOKE_INTERFACE) Execute(frame *rtda.Frame) {
 		panic("java.lang.IncompatibleClassChangeError")
 	}
 
-	methodToBeInvoked := heap.LookupMethodInClass(ref.Class(), methodRef.Name(), methodRef.Descriptor())
+	methodToBeInvoked := rtda.LookupMethodInClass(ref.Class(), methodRef.Name(), methodRef.Descriptor())
 	if methodToBeInvoked == nil || methodToBeInvoked.IsAbstract() {
 		panic("java.lang.AbstractMethodError")
 	}

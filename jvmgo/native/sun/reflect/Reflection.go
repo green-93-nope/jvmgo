@@ -2,7 +2,6 @@ package reflect
 
 import "jvmgo/jvmgo/native"
 import "jvmgo/jvmgo/rtda"
-import "jvmgo/jvmgo/rtda/heap"
 
 func init() {
 	native.Register("sun/reflect/Reflection", "getCallerClass", "()Ljava/lang/Class;", getCallerClass)
@@ -27,7 +26,7 @@ func getClassAccessFlags(frame *rtda.Frame) {
 	vars := frame.LocalVars()
 	_type := vars.GetRef(0)
 
-	goClass := _type.Extra().(*heap.Class)
+	goClass := _type.Extra().(*rtda.Class)
 	flags := goClass.AccessFlags()
 
 	stack := frame.OperandStack()

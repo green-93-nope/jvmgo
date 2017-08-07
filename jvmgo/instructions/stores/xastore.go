@@ -3,7 +3,6 @@ package stores
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 )
 
 // Store into reference array
@@ -126,7 +125,7 @@ func (self *SASTORE) Execute(frame *rtda.Frame) {
 	shorts[index] = int16(val)
 }
 
-func checkNotNil(ref *heap.Object) {
+func checkNotNil(ref *rtda.Object) {
 	if ref == nil {
 		panic("java.lang.NullPointerException")
 	}

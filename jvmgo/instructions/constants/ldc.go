@@ -3,7 +3,6 @@ package constants
 import (
 	"jvmgo/jvmgo/instructions/base"
 	"jvmgo/jvmgo/rtda"
-	"jvmgo/jvmgo/rtda/heap"
 )
 
 type LDC struct{ base.Index8Instruction }
@@ -29,10 +28,10 @@ func _ldc(frame *rtda.Frame, index uint) {
 	case float32:
 		stack.PushFloat(c.(float32))
 	case string:
-		internedStr := heap.JString(class.Loader(), c.(string))
+		internedStr := rtda.JString(class.Loader(), c.(string))
 		stack.PushRef(internedStr)
-	case *heap.ClassRef: // instance of class constant
-		classRef := c.(*heap.ClassRef)
+	case *rtda.ClassRef: // instance of class constant
+		classRef := c.(*rtda.ClassRef)
 		classObj := classRef.ResolvedClass().JClass()
 		stack.PushRef(classObj)
 	default:

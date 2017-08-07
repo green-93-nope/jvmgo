@@ -1,18 +1,16 @@
 package rtda
 
-import "jvmgo/jvmgo/rtda/heap"
-
 // stack frame
 type Frame struct {
 	lower        *Frame // stack is implemented as linked list
 	localVars    LocalVars
 	operandStack *OperandStack
 	thread       *Thread
-	method       *heap.Method
+	method       *Method
 	nextPC       int // the next instruction after the call
 }
 
-func newFrame(thread *Thread, method *heap.Method) *Frame {
+func newFrame(thread *Thread, method *Method) *Frame {
 	return &Frame{
 		thread:       thread,
 		method:       method,
@@ -31,7 +29,7 @@ func (self *Frame) OperandStack() *OperandStack {
 func (self *Frame) Thread() *Thread {
 	return self.thread
 }
-func (self *Frame) Method() *heap.Method {
+func (self *Frame) Method() *Method {
 	return self.method
 }
 func (self *Frame) NextPC() int {
